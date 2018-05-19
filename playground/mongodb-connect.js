@@ -7,7 +7,7 @@ const {MongoClient, ObjectID} = require('mongodb');
 
 
 //NOTE: TodoApp didnt exist beforehand, mongodb allows you
-// to create a db on the fly, versus having to create befroehand
+// to create a db on the fly, versus having to create beforehand
 MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
   if (err){
     return console.log("Unable to connect to MongoDB server");
