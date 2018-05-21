@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
 const {mongoose} = require('./db/mongoose');
 // Mongoose has a model feature, which gives more structure to the
@@ -34,7 +35,32 @@ app.get('/todos', (req, res) => {
   }, (e) => {
     res.status(400).send(e);
   })
-})
+});
+
+
+// Using colon, :, before a variable such as id is how parameters are passed
+// using http.  The parameter gets attached as a key-value pair
+// on the req.params object
+app.get('/todos/:id', (req, res) => {
+  let id = req.params.id;
+
+  if (!ObjectID.isValid(id)){
+    return res.status(404).send();
+  }
+
+  Todo.findById(id).then((todo) => {
+    if (todo){
+      res.send({todo});
+    }
+    else{
+      res.status(404).send();
+    }
+
+  }).catch((e) => {
+    res.status(400).send();
+  });
+
+});
 
 app.listen(PORT, () => {
   console.log('Started on port: ', PORT);
