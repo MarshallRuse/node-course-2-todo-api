@@ -6,6 +6,6 @@ mongoose.Promise = global.Promise;
 // but same parameters passed
 // however, behind the scenes mongoose is more complex, handles and maintains
 // connection, as well as timing events to wait for a connection establishment
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp');
+mongoose.connect(process.env.MONGODB_URI);
 
 module.exports = {mongoose};
