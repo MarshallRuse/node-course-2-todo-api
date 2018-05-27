@@ -74,7 +74,6 @@ app.delete('/todos/:id', (req, res) => {
 
   //remove todo by id
   Todo.findByIdAndRemove(id).then((todo) => {
-    console.log(todo);
     //success
       // if no doc, send 404
       // if doc, send doc back with 200
@@ -111,7 +110,6 @@ app.patch('/todos/:id', (req, res) => {
     if (!todo){
       return res.status(404).send();
     }
-
     res.send({todo});
 
   }).catch((e) => {
