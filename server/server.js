@@ -66,22 +66,23 @@ app.delete('/todos/:id', (req, res) => {
   // get the id
   let id = req.params.id;
 
+
   // validate the id -> not valid? return 404
-  if (ObjectID.isValid(id)){
+  if (!ObjectID.isValid(id)){
     return res.status(404).send();
   }
 
   //remove todo by id
-  Todo.findByIdAndRemove(id).then((doc) => {
+  Todo.findByIdAndRemove(id).then((todo) => {
+    console.log(todo);
     //success
       // if no doc, send 404
       // if doc, send doc back with 200
-    if (doc) {
-      res.send(doc);
+    if (!todo) {
+      return res.status(404).send();
     }
-    else {
-      res.status(404).send();
-    }
+
+    res.send(todo);
   }).catch((e) => {
     res.status(400).send();
   });
