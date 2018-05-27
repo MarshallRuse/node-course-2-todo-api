@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
@@ -66,7 +67,6 @@ app.delete('/todos/:id', (req, res) => {
   // get the id
   let id = req.params.id;
 
-
   // validate the id -> not valid? return 404
   if (!ObjectID.isValid(id)){
     return res.status(404).send();
@@ -86,8 +86,37 @@ app.delete('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send();
   });
+});
 
+app.patch('/todos/:id', (req, res) => {
+  let id = req.params.id;
+  // lodash has a pick() method that filters certain object parameters
+  // we only want users to be allowed to update 'text' and 'completed'
+  let body = _.pick(req.body, ['text', 'completed']);
 
+  if (!ObjectID.isValid(id)){
+    return res.status(404).send();
+  }
+
+  // lodash also has verification functions
+  if (_.isBoolean(body.completed) && body.completed){
+    // we control this param, and add it when we want to, rather than the user
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null; //remove from the database
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo){
+      return res.status(404).send();
+    }
+
+    res.send({todo});
+
+  }).catch((e) => {
+    res.status(400).send();
+  });
 });
 
 app.listen(PORT, () => {
