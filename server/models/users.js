@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -61,9 +62,7 @@ UserSchema.statics.findByToken = function(token){
   try {
     decoded = jwt.verify(token, 'abc123');
   } catch(e) {
-    return new Promise((resolve, reject) => {
-      reject();
-    });
+    return new Promise.reject();
   }
 
   return User.findOne({
@@ -72,6 +71,26 @@ UserSchema.statics.findByToken = function(token){
     'tokens.access': 'auth'
   });
 };
+
+// middleware to run before the specified event, here 'save'
+UserSchema.pre('save', function (next) {
+  let user = this;
+
+  //only re-hash if password property has been modified,
+  // rehashing our old hashed password would ruin things
+  if (user.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        user.password = hash;
+        next();
+      });
+    });
+
+  } else {
+    next();
+  }
+
+});
 
 const User = mongoose.model('User', UserSchema);
 
