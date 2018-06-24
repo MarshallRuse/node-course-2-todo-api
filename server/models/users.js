@@ -54,6 +54,18 @@ UserSchema.methods.generateAuthToken = function (){
   });
 };
 
+UserSchema.methods.removeToken = function(token) {
+  let user = this;
+  // $pull is a mongodb function that removes things from an array
+  // that match a certain criteria
+  // Note: update returns a promise, as is expected in server.js
+  return user.update({
+    $pull: {
+      tokens: {token}
+    }
+  })
+};
+
 // .statics bind model-functions
 UserSchema.statics.findByToken = function(token){
   let User = this;
